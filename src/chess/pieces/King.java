@@ -2,14 +2,17 @@ package chess.pieces;
 
 import bordaGame.Board;
 import bordaGame.posicao;
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.Color;
 
 public class King extends ChessPiece {
 
-	public King(Board board, Color color) {
-		super(board, color);
+	private ChessMatch chessMatch;
 
+	public King(Board board, Color color, ChessMatch chessMatch) {
+		super(board, color);
+		this.chessMatch = chessMatch;
 	}
 
 	@Override
@@ -20,6 +23,11 @@ public class King extends ChessPiece {
 	private boolean canMove(posicao position) {
 		ChessPiece p = (ChessPiece) getBoard().piece(position);
 		return p == null || p.getColor() != getColor();
+	}
+
+	private boolean testRookCasting(posicao position) {
+		ChessPiece p = (ChessPiece) getBoard().piece(position);
+		return p != null && p instanceof Rook && p.getColor() == getColor() && getMoveCount() == 0;
 	}
 
 	@Override
@@ -71,9 +79,36 @@ public class King extends ChessPiece {
 		}
 
 		// SE
-		p.setValues(position.getRow() + 1, position.getColumn() +1);
+		p.setValues(position.getRow() + 1, position.getColumn() + 1);
 		if (getBoard().positionExists(p) && canMove(p)) {
 			mat[p.getRow()][p.getColumn()] = true;
+		}
+
+		// #Movimento Especial Castling
+
+		if (getMoveCount() == 0 && !chessMatch.getCheck()) {
+			// Rook pequeno (lado direito do rei)
+			posicao posT1 = new posicao(position.getRow(), position.getColumn() + 3);
+			if (testRookCasting(posT1)) {
+				posicao p1 = new posicao(position.getRow(), position.getColumn() + 1);
+				posicao p2 = new posicao(position.getRow(), position.getColumn() + 2);
+				if (getBoard().piece(p1) == null && getBoard().piece(p2) == null) {
+					mat[position.getRow()][position.getColumn() + 2] = true;
+				}
+
+			}
+			// Rook pequeno (lado direito do rei)
+			posicao posT2 = new posicao(position.getRow(), position.getColumn() - 4);
+			if (testRookCasting(posT2)) {
+				posicao p1 = new posicao(position.getRow(), position.getColumn() - 1);
+				posicao p2 = new posicao(position.getRow(), position.getColumn() - 2);
+				posicao p3 = new posicao(position.getRow(), position.getColumn() - 3);
+				if (getBoard().piece(p1) == null && getBoard().piece(p2) == null && getBoard().piece(p3) == null) {
+					mat[position.getRow()][position.getColumn() - 2] = true;
+				}
+
+			}
+
 		}
 
 		return mat;
