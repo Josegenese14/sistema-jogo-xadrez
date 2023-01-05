@@ -97,7 +97,7 @@ public class King extends ChessPiece {
 				}
 
 			}
-			// Rook pequeno (lado direito do rei)
+			// Rook Grande(lado esquerdo do rei)
 			posicao posT2 = new posicao(position.getRow(), position.getColumn() - 4);
 			if (testRookCasting(posT2)) {
 				posicao p1 = new posicao(position.getRow(), position.getColumn() - 1);
